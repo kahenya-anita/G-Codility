@@ -34,3 +34,54 @@
 
 # N is an integer within the range [1..200,000];
 # strings L1 and L2 consist only of the characters "." and/or "x".
+
+def solution(L1, L2):
+    N = len(L1)
+    
+    def longest_repair(lane):
+        max_repair = 0
+        current_repair = 0
+        for segment in lane:
+            if segment == 'x':
+                current_repair += 1
+                max_repair = max(max_repair, current_repair)
+            else:
+                current_repair = 0
+        return max_repair
+
+    # Find the longest repairable stretch in each lane
+    repair_L1 = longest_repair(L1)
+    repair_L2 = longest_repair(L2)
+
+    # Count total potholes
+    total_potholes = L1.count('x') + L2.count('x')
+
+    # If we can repair all potholes in one lane, do it
+    if repair_L1 == L1.count('x') or repair_L2 == L2.count('x'):
+        return total_potholes
+
+    # Otherwise, we need to find the best non-overlapping repairs
+    best_repair = 0
+    current_repair_L1 = 0
+    current_repair_L2 = 0
+
+    for i in range(N):
+        if L1[i] == 'x':
+            current_repair_L1 += 1
+        else:
+            current_repair_L1 = 0
+
+        if L2[i] == 'x':
+            current_repair_L2 += 1
+        else:
+            current_repair_L2 = 0
+
+        best_repair = max(best_repair, current_repair_L1 + repair_L2, repair_L1 + current_repair_L2)
+
+    return min(best_repair, total_potholes)
+
+# Test cases
+print(solution("..xx.x.", "x.x.x.."))  # Should return 4
+print(solution(".xxx...x", "..x.xxxx"))  # Should return 6
+print(solution("xxxxx", ".x..x"))  # Should return 5
+print(solution("x...x", "..x.."))  # Should return 2
