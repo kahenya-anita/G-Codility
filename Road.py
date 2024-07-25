@@ -37,48 +37,20 @@
 
 def solution(L1, L2):
     N = len(L1)
-    
-    def longest_repair(lane):
-        max_repair = 0
-        current_repair = 0
-        for segment in lane:
-            if segment == 'x':
-                current_repair += 1
-                max_repair = max(max_repair, current_repair)
-            else:
-                current_repair = 0
-        return max_repair
-
-    # Find the longest repairable stretch in each lane
-    repair_L1 = longest_repair(L1)
-    repair_L2 = longest_repair(L2)
-
-    # Count total potholes
-    total_potholes = L1.count('x') + L2.count('x')
-
-    # If we can repair all potholes in one lane, do it
-    if repair_L1 == L1.count('x') or repair_L2 == L2.count('x'):
-        return total_potholes
-
-    # Otherwise, we need to find the best non-overlapping repairs
-    best_repair = 0
-    current_repair_L1 = 0
-    current_repair_L2 = 0
-
+    # Count potholes from left to right in L1
+    potholes_L1 = [0] * (N + 1)
     for i in range(N):
-        if L1[i] == 'x':
-            current_repair_L1 += 1
-        else:
-            current_repair_L1 = 0
-
-        if L2[i] == 'x':
-            current_repair_L2 += 1
-        else:
-            current_repair_L2 = 0
-
-        best_repair = max(best_repair, current_repair_L1 + repair_L2, repair_L1 + current_repair_L2)
-
-    return min(best_repair, total_potholes)
+        potholes_L1[i + 1] = potholes_L1[i] + (1 if L1[i] == 'x' else 0)
+    # Count potholes from right to left in L2
+    potholes_L2 = [0] * (N + 1)
+    for i in range(N - 1, -1, -1):
+        potholes_L2[i] = potholes_L2[i + 1] + (1 if L2[i] == 'x' else 0)
+    # Find the maximum number of potholes that can be repaired
+    max_repaired = 0
+    for i in range(N + 1):
+        repaired = potholes_L1[i] + potholes_L2[i]
+        max_repaired = max(max_repaired, repaired)
+    return max_repaired
 
 # Test cases
 print(solution("..xx.x.", "x.x.x.."))  # Should return 4
