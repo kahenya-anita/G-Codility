@@ -22,3 +22,40 @@
 
 # N is an integer within the range [1..100,000];
 # string S is made only of digits (0−9).
+
+def solution(S):
+    # Count the frequency of each digit
+    digit_count = [0] * 10
+    for digit in S:
+        digit_count[int(digit)] += 1
+
+    # Build the left half of the palindrome
+    left_half = []
+    middle = ""
+    
+    # Start from 9 and work our way down
+    for digit in range(9, -1, -1):
+        # Skip leading zeros
+        if not left_half and digit == 0:
+            continue
+        
+        # Add pairs of digits to the left half
+        pairs = digit_count[digit] // 2
+        left_half.extend([str(digit)] * pairs)
+        digit_count[digit] -= pairs * 2
+        
+        # If we haven't found a middle digit yet and there's an odd count
+        if not middle and digit_count[digit] > 0:
+            middle = str(digit)
+
+    # Construct the full palindrome
+    result = ''.join(left_half) + middle + ''.join(left_half[::-1])
+    
+    # Handle the case where all digits were zero
+    return result if result else "0"
+
+# Test cases
+print(solution("39878"))  # Should return "898"
+print(solution("00900"))  # Should return "9"
+print(solution("0000"))   # Should return "0"
+print(solution("54321"))  # Should return "5"
